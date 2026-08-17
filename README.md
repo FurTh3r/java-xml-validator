@@ -1,73 +1,121 @@
-# Ontology Validator and Editor with CDuce and Java
+# Ontology Validator and Editor
 
-A tool for automatic validation, transformation, and management of ontologies expressed in XML/OWL, developed as part of the Bachelor's thesis in Computer Science at the University of Turin.
+A desktop application for validating, inspecting, and transforming RDF/XML and OWL ontologies through a JavaFX interface backed by CDuce.
 
-## Description
+The project was developed as part of a Bachelor's thesis in Computer Science at the University of Turin. It combines XML analysis utilities, dynamically generated CDuce programs, structural comparison, and a graphical editor in a single workflow.
 
-This project integrates **Java** and **CDuce** to create a comprehensive ecosystem dedicated to the manipulation of XML-based ontologies. It includes:
+## Features
 
--  Automated structural consistency verification of ontologies  
--  Assisted correction and transformation of OWL structures  
--  JavaFX graphical user interface for user interaction  
--  Java wrapper to execute and control CDuce code  
--  Analysis of differences (diff) between ontology versions  
+- Load and format RDF/XML ontologies.
+- Inspect and manage XML namespaces.
+- Validate ontology syntax and expected structure.
+- Report malformed or incompatible elements.
+- Compare ontology versions at node level.
+- Generate CDuce verification and transformation programs from templates.
+- Apply assisted corrections and save the resulting ontology.
+- Record timestamped application logs.
+- Test the XML utilities, middleware, and command-execution layer.
 
-##  Project Structure
+## Architecture
 
-```
-/src
-├── gui/ # Controllers and user interface (JavaFX)
-/logic
-│ ├── cducecompiler/ # Creates and operates CDuce commands via command line
-│ ├── data/ # Definitions of custom data structures (Ontology, ErrorInfo, etc.)
-│ ├── shellinterface/ # Executes shell commands in WSL environment
-│ ├── utilities/ # Utility classes and helper functions
-│ └── xml/ # XML utilities: diff checker, validation, etc.
-├── logs/ # Logging system
-├── main/ # Main application entry point
-├── middleware/ # Middleware singleton managing Java-CDuce communication
-/resources
-/templates/ # CDuce templates with dynamic placeholders
-/ontologies/ # Sample ontologies for testing
-```
+The application is organized into five main areas:
 
-##  Requirements
+- **GUI** — JavaFX controllers, FXML views, and styles.
+- **Middleware** — coordinates user actions and the validation/transformation workflow.
+- **CDuce integration** — loads templates, replaces placeholders, and executes generated CDuce programs.
+- **XML utilities** — formatting, XPath parsing, difference checking, and error reporting.
+- **Data model** — ontologies, edits, structural checks, and error information.
 
-- **Java 17+**  
-- **CDuce** (compiler installed and accessible via shell)  
-- **JavaFX SDK**  
-- **Maven** or **Gradle** for automated builds  
+## Requirements
 
-##  Main Features
+- JDK 23, as configured in the Maven compiler properties.
+- Apache Maven.
+- JavaFX 17.0.2, resolved through Maven.
+- CDuce installed in a Linux or WSL environment.
+- A configured .env file containing the paths used by the application.
 
-- Structural XML validation via CDuce and custom XPath queries  
-- Semantic transformation of thesauri into OWL ontologies  
-- Error highlighting with correction suggestions  
-- User-friendly interface supporting namespaces, editor, and hierarchical view  
-- Diff system between two ontology versions with node-level analysis  
+The command-execution layer converts Windows paths to WSL paths, so the current integration is primarily designed for Windows with WSL.
 
-##  Screenshot (GUI)
-![App_icon](images/app_icon.png)
+## Configuration
 
-![Main_interface_namespaces](images/namespacesFrame.png)
+Copy the supplied template before running the application:
 
-![Main interface check_structure](images/structureFrame.png)
+    cp .env_template .env
 
-![Main interface syntax_error](images/syntaxError.png)
+Then replace every PATH placeholder with a valid path for your machine.
 
-![Main interface wrong_ontology](images/singleClass1.png)
+| Variable | Purpose |
+| --- | --- |
+| LOG_PATH | Directory used for application logs. |
+| CDUCE_CODE_PATH | Project-relative directory for generated CDuce files. |
+| CDUCE_TEMPLATE_PATH | Path to the JSON placeholder-definition file. |
+| CDUCE_CODE_PATH_ABSOLUTE | Absolute CDuce source directory used during execution. |
+| ONTOLOGY_INPUT | Project-relative temporary input ontology. |
+| ONTOLOGY_INPUT_ABSOLUTE | Absolute input ontology path, accessible from CDuce. |
+| ONTOLOGY_OUTPUT_ABSOLUTE | Absolute destination for transformed ontologies. |
 
-![Main interface editor_wrong_ontology](images/singleclass2.png)
+The repository includes the base CDuce template and substitution map under src/main/resources/cducesourcecode.
 
-![Main interface correct_ontology](images/correctOntology.png)
+## Build and Test
 
-##  Reference Thesis
+Resolve dependencies, compile the application, and run the test suite:
 
-Lorenzo Pasini, *Strumenti formali e user-friendly per la manipolazione di strutture ontologiche*  
-University of Turin, Academic Year 2024/2025  
-Advisor: Prof. Viviana Bono  
-Co-advisor: Dr. Davide Camino  
+    mvn clean test
 
-##  License
+Build the project without running tests:
 
-This project is distributed under the MIT License.
+    mvn clean package -DskipTests
+
+The current pom.xml does not configure a JavaFX launcher plugin or an executable JAR. The most reliable way to start the project is therefore to import it as a Maven project in an IDE and run:
+
+    com.jataxmltransformer.main.Main
+
+If launching from the command line, configure the JavaFX module path for your local JavaFX installation and use the same main class.
+
+## Screenshots
+
+![Application icon](images/app_icon.png)
+
+![Namespace management](images/namespacesFrame.png)
+
+![Structure validation](images/structureFrame.png)
+
+![Syntax error reporting](images/syntaxError.png)
+
+![Ontology editor](images/singleclass2.png)
+
+![Validated ontology](images/correctOntology.png)
+
+## Repository Structure
+
+    .
+    ├── pom.xml
+    ├── .env_template
+    ├── images/
+    └── src/
+        ├── main/
+        │   ├── java/com/jataxmltransformer/
+        │   │   ├── GUI/
+        │   │   ├── logic/
+        │   │   ├── logs/
+        │   │   ├── main/
+        │   │   └── middleware/
+        │   └── resources/
+        │       ├── GUI/
+        │       ├── cducesourcecode/
+        │       └── images/
+        └── test/java/
+
+## Related Work
+
+- [Ontology transformation scripts](https://github.com/FurTh3r/ontology-transformation-cduce)
+- [CDuce syntax highlighting for VS Code](https://github.com/FurTh3r/cduce-syntax-highlighting)
+- [Bachelor's thesis](https://github.com/FurTh3r/batchelor_thesis)
+
+## Author
+
+**Lorenzo Pasini** — [FurTh3r](https://github.com/FurTh3r)
+
+## License
+
+No license file is currently included in this repository. Unless otherwise stated by the author, all rights are reserved.
